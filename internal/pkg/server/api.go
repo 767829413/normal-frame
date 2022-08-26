@@ -55,6 +55,13 @@ func (s *ApiServer) setGrpcServer(grpcServer *grpcServer) {
 
 func (s *ApiServer) PrepareRun() *ApiServer {
 	//TODO 初始化外部依赖 数据库,redis等等
+	if s.MySQLOptions.Enabled {
+
+	}
+
+	if s.RedisOptions.Enabled {
+
+	}
 
 	// 优雅关停
 	s.gs.AddShutdownCallback(shutdown.ShutdownFunc(func(string) error {
