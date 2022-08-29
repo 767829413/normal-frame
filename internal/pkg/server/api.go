@@ -64,16 +64,14 @@ func (s *ApiServer) setGrpcServer(grpcServer *grpcServer) {
 
 func (s *ApiServer) PrepareRun() *ApiServer {
 	tracer := apm.GetApmTracer(s.ApmOptions)
-	if s.ApmOptions.Http {
-		if tracer != nil {
-			s.genericServer.Use(v3.Middleware(s.genericServer.Engine, tracer.Tracer))
-		}
+	if s.ApmOptions.Http && tracer != nil {
+		s.genericServer.Use(v3.Middleware(s.genericServer.Engine, tracer.Tracer))
 	}
 
 	//初始化外部依赖 数据库,redis等等
 	st := store.GetMySQLIncOr(s.MySQLOptions)
-	if s.ApmOptions.Mysql {
-		if tracer != nil {
+	if st != nil {
+		if s.ApmOptions.Mysql && tracer != nil {
 			err := st.GetDb().Use(gormPlugin.New(tracer.Tracer,
 				gormPlugin.WithPeerAddr(fmt.Sprintf("%s:%d", s.MySQLOptions.Host, s.MySQLOptions.Port)),
 				gormPlugin.WithSqlDBType(gormPlugin.MYSQL),
@@ -84,11 +82,17 @@ func (s *ApiServer) PrepareRun() *ApiServer {
 				logger.LogErrorf(nil, logger.LogNameMysql, "mysql set apm plugin,error: %v", err)
 			}
 		}
+		// TODO 如果有数据库的话要执行数据库迁移
+
 	}
+
 	r := store.GetRedisIncOr(s.RedisOptions)
-	if s.ApmOptions.Redis {
-		r.Getclient().AddHook(redisSkyHook.NewSkyWalkingHook(tracer.Tracer))
+	if r != nil {
+		if s.ApmOptions.Redis && tracer != nil {
+			r.Getclient().AddHook(redisSkyHook.NewSkyWalkingHook(tracer.Tracer))
+		}
 	}
+
 	// 优雅关停
 	s.gs.AddShutdownCallback(shutdown.ShutdownFunc(func(string) error {
 		tr := apm.GetApmTracer(nil)

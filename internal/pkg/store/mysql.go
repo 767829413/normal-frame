@@ -1,9 +1,12 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
+	"github.com/767829413/normal-frame/internal/apiserver/model"
+	"github.com/767829413/normal-frame/internal/pkg/logger"
 	mylog "github.com/767829413/normal-frame/internal/pkg/logger"
 	"github.com/767829413/normal-frame/internal/pkg/options"
 	"github.com/767829413/normal-frame/pkg/db"
@@ -62,12 +65,26 @@ func (d *datastore) GetDb() *gorm.DB {
 }
 
 func (d *datastore) Close() error {
-	if dbHandler.db != nil {
-		db, err := dbHandler.db.DB()
+	if d.db != nil {
+		db, err := d.db.DB()
 		if err != nil {
-			mylog.LogError(nil, mylog.LogNameMysql, "dbHandler get gorm db instance failed")
+			mylog.LogError(nil, mylog.LogNameMysql, "Close get gorm db instance failed")
 		}
 		return db.Close()
+	}
+	return nil
+}
+
+func (d *datastore) SqlMigrate() (err error) {
+
+	if d.db == nil {
+		err = errors.New("SqlMigrate get gorm db instance failed")
+		mylog.LogError(nil, mylog.LogNameMysql, err.Error())
+		return
+	}
+	if err = d.db.AutoMigrate(model.GetModels()); err != nil {
+		logger.LogErrorw(nil, logger.LogNameMysql, "sqlMigrate Orm.DB.DB() err ", err)
+		return
 	}
 	return nil
 }
