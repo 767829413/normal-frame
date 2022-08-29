@@ -31,8 +31,6 @@ func (s *SecureOptions) ApplyTo(ec *config.ExtraConfig) error {
 	return nil
 }
 
-// AddFlags adds flags related to HTTPS server for a specific APIServer to the
-// specified FlagSet.
 func (s *SecureOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&s.ServerCert.CertDirectory, "secure.tls.cert-dir", s.ServerCert.CertDirectory, ""+
 		"The directory where the TLS certs are located. "+

@@ -29,8 +29,6 @@ func (s *HttpsOptions) ApplyTo(ec *config.ExtraConfig) error {
 	return nil
 }
 
-// AddFlags adds flags related to features for a specific api server to the
-// specified FlagSet.
 func (s *HttpsOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&s.Enabled, "https.enabled", s.Enabled, "Whether to enable GRPC.")
 

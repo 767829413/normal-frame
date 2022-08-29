@@ -4,38 +4,49 @@ import (
 	"time"
 
 	"github.com/spf13/pflag"
+	glogger "gorm.io/gorm/logger"
 )
 
 type MySQLOptions struct {
 	Enabled               bool          `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
+	IsDebug               bool          `json:"is-debug" mapstructure:"is-debug" yaml:"is-debug"`
 	Host                  string        `json:"host,omitempty" mapstructure:"host" yaml:"host"`
+	Port                  int           `json:"port,omitempty" mapstructure:"port" yaml:"port"`
 	Username              string        `json:"username,omitempty" mapstructure:"username" yaml:"username"`
 	Password              string        `json:"-" mapstructure:"password" yaml:"password"`
 	Database              string        `json:"database"  mapstructure:"database" yaml:"database"`
 	MaxIdleConnections    int           `json:"max-idle-connections,omitempty" mapstructure:"max-idle-connections" yaml:"max-idle-connections"`
 	MaxOpenConnections    int           `json:"max-open-connections,omitempty" mapstructure:"max-open-connections" yaml:"max-open-connections"`
 	MaxConnectionLifeTime time.Duration `json:"max-connection-life-time,omitempty" mapstructure:"max-connection-life-time" yaml:"max-connection-life-time"`
+	LogLevel              int           `json:"log-level" mapstructure:"log-level" yaml:"log-level"`
 }
 
 func NewMySQLOptions() *MySQLOptions {
 	return &MySQLOptions{
 		Enabled:               false,
-		Host:                  "127.0.0.1:3306",
+		IsDebug:               false,
+		Host:                  "127.0.0.1",
+		Port:                  3306,
 		Username:              "",
 		Password:              "",
 		Database:              "",
 		MaxIdleConnections:    100,
 		MaxOpenConnections:    100,
 		MaxConnectionLifeTime: time.Duration(10) * time.Second,
+		LogLevel:              int(glogger.Info),
 	}
 }
 
-// AddFlags adds flags related to mysql storage for a specific APIServer to the specified FlagSet.
 func (o *MySQLOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.Enabled, "mysql.enabled", o.Enabled, "Whether to enable MySQL.")
 
+	fs.BoolVar(&o.IsDebug, "mysql.is-debug", o.IsDebug, "Whether to enable MySQL debug mode.")
+
 	fs.StringVar(&o.Host, "mysql.host", o.Host, ""+
 		"MySQL service host address. If left blank, the following related mysql options will be ignored.")
+
+	fs.IntVar(&o.Port, "mysql.port", o.Port, ""+
+		"The port MySQL is listening on.")
 
 	fs.StringVar(&o.Username, "mysql.username", o.Username, ""+
 		"Username for access to mysql service.")
@@ -54,4 +65,7 @@ func (o *MySQLOptions) AddFlags(fs *pflag.FlagSet) {
 
 	fs.DurationVar(&o.MaxConnectionLifeTime, "mysql.max-connection-life-time", o.MaxConnectionLifeTime, ""+
 		"Maximum connection life time allowed to connect to mysql.")
+
+	fs.IntVar(&o.LogLevel, "mysql.log-level", o.LogLevel, ""+
+		"Specify gorm log level. Silent-1 Error-2 Warn-3 Info-4")
 }

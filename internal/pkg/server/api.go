@@ -1,9 +1,17 @@
 package server
 
 import (
+	"fmt"
+
+	gormPlugin "github.com/767829413/normal-frame/fork/SkyAPM/go2sky-plugins/gorm"
+
+	v3 "github.com/767829413/normal-frame/fork/SkyAPM/go2sky-plugins/gin/v3"
+	redisSkyHook "github.com/767829413/normal-frame/fork/SkyAPM/go2sky-plugins/redis-go2sky-hook"
 	"github.com/767829413/normal-frame/internal/apiserver/options"
 	"github.com/767829413/normal-frame/internal/pkg/logger"
 	extDep "github.com/767829413/normal-frame/internal/pkg/options"
+	"github.com/767829413/normal-frame/internal/pkg/store"
+	"github.com/767829413/normal-frame/pkg/apm"
 	"github.com/767829413/normal-frame/pkg/shutdown"
 	"github.com/767829413/normal-frame/pkg/shutdown/shutdownmanagers/posixsignal"
 )
@@ -14,6 +22,7 @@ type ApiServer struct {
 	grpcServer    *grpcServer
 	*extDep.MySQLOptions
 	*extDep.RedisOptions
+	*extDep.ApmOptions
 }
 
 func CreateAPIServer(opts *options.Options) (*ApiServer, error) {
@@ -54,28 +63,64 @@ func (s *ApiServer) setGrpcServer(grpcServer *grpcServer) {
 }
 
 func (s *ApiServer) PrepareRun() *ApiServer {
-	//TODO 初始化外部依赖 数据库,redis等等
-	if s.MySQLOptions.Enabled {
-
+	tracer := apm.GetApmTracer(s.ApmOptions)
+	if s.ApmOptions.Http {
+		if tracer != nil {
+			s.genericServer.Use(v3.Middleware(s.genericServer.Engine, tracer.Tracer))
+		}
 	}
 
-	if s.RedisOptions.Enabled {
-
+	//初始化外部依赖 数据库,redis等等
+	st := store.GetMySQLIncOr(s.MySQLOptions)
+	if s.ApmOptions.Mysql {
+		if tracer != nil {
+			err := st.GetDb().Use(gormPlugin.New(tracer.Tracer,
+				gormPlugin.WithPeerAddr(fmt.Sprintf("%s:%d", s.MySQLOptions.Host, s.MySQLOptions.Port)),
+				gormPlugin.WithSqlDBType(gormPlugin.MYSQL),
+				gormPlugin.WithParamReport(),
+				gormPlugin.WithQueryReport(),
+			))
+			if err != nil {
+				logger.LogErrorf(nil, logger.LogNameMysql, "mysql set apm plugin,error: %v", err)
+			}
+		}
 	}
-
+	r := store.GetRedisIncOr(s.RedisOptions)
+	if s.ApmOptions.Redis {
+		r.Getclient().AddHook(redisSkyHook.NewSkyWalkingHook(tracer.Tracer))
+	}
 	// 优雅关停
 	s.gs.AddShutdownCallback(shutdown.ShutdownFunc(func(string) error {
-		s.genericServer.Close()
-		if s.grpcServer.enable && s.grpcServer != nil {
+		tr := apm.GetApmTracer(nil)
+		if tr != nil {
+			_ = tr.Close()
+		}
+
+		st := store.GetMySQLIncOr(nil)
+		if st != nil {
+			_ = st.Close()
+		}
+
+		r := store.GetRedisIncOr(nil)
+		if r != nil {
+			_ = r.Close()
+		}
+
+		if s.genericServer != nil {
+			s.genericServer.Close()
+		}
+
+		if s.grpcServer != nil {
 			s.grpcServer.Close()
 		}
+
 		return nil
 	}))
 	return s
 }
 
 func (s *ApiServer) Run() error {
-	if s.grpcServer.enable {
+	if s.grpcServer != nil && s.grpcServer.enable {
 		go s.grpcServer.Run()
 	}
 	// start shutdown managers

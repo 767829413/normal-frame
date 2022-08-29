@@ -20,7 +20,7 @@ func NewGrpcServer(extraConfig *config.ExtraConfig) (*grpcServer, error) {
 	// 	logger.LogErrorf(nil,logger.LogNameGRpc,"Failed to generate credentials %s", err.Error())
 	// }
 	// opts := []grpc.ServerOption{grpc.MaxRecvMsgSize(extraConfig.MaxMsgSize), grpc.Creds(creds)}
-	// storeIns, _ := mysql.GetMySQLFactoryOr(c.mysqlOptions)
+	// storeIns := mysql.GetMySQLIncOr(c.mysqlOptions)
 	// storeIns, _ := etcd.GetEtcdFactoryOr(c.etcdOptions, nil)
 	// store.SetClient(storeIns)
 

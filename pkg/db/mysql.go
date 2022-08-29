@@ -2,16 +2,21 @@ package db
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"time"
 
+	"github.com/767829413/normal-frame/internal/pkg/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	glogger "gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
 // Options defines optsions for mysql database.
 type Options struct {
 	Host                  string
+	Port                  int
 	Username              string
 	Password              string
 	Database              string
@@ -19,28 +24,48 @@ type Options struct {
 	MaxOpenConnections    int
 	MaxConnectionLifeTime time.Duration
 	LogLevel              int
-	Logger                logger.Interface
+	IsDebug               bool
 }
 
 // New create a new gorm db instance with the given options.
 func New(opts *Options) (*gorm.DB, error) {
-	dsn := fmt.Sprintf(`%s:%s@tcp(%s)/%s?charset=utf8&parseTime=%t&loc=%s`,
+	dsn := fmt.Sprintf(`%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=%t&loc=%s`,
 		opts.Username,
 		opts.Password,
 		opts.Host,
+		opts.Port,
 		opts.Database,
 		true,
 		"Local")
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: opts.Logger,
-	})
+	config := &gorm.Config{
+		SkipDefaultTransaction: true,
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
+		},
+	}
+
+	if opts.IsDebug {
+		newLogger := glogger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			glogger.Config{
+				SlowThreshold: time.Second,  // 慢 SQL 阈值
+				LogLevel:      glogger.Info, // Log level
+				Colorful:      true,         // 禁用彩色打印
+			},
+		)
+		config.Logger = newLogger
+	}
+
+	db, err := gorm.Open(mysql.Open(dsn), config)
 	if err != nil {
+		logger.LogErrorf(nil, logger.LogNameMysql, "mysql gorm.Open,error: %v", err)
 		return nil, err
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
+		logger.LogErrorf(nil, logger.LogNameMysql, "mysql db.DB(),error: %v", err)
 		return nil, err
 	}
 

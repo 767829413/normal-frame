@@ -31,7 +31,6 @@ func (s *ServerRunOptions) ApplyTo(c *config.GenericConfig) error {
 	return nil
 }
 
-// AddFlags adds flags for a specific APIServer to the specified FlagSet.
 func (s *ServerRunOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&s.Mode, "server.mode", s.Mode, ""+
 		"Start the server in a specified server mode. Supported server mode: debug, test, release.")

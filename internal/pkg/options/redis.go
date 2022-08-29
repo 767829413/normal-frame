@@ -18,7 +18,6 @@ func NewRedisOptions() *RedisOptions {
 	}
 }
 
-// AddFlags adds flags related to mysql storage for a specific APIServer to the specified FlagSet.
 func (o *RedisOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.Enabled, "redis.enabled", o.Enabled, "Whether to enable Redis.")
 

@@ -39,9 +39,7 @@ func (s *FeatureOptions) ApplyTo(c *config.GenericConfig) error {
 	return nil
 }
 
-// AddFlags adds flags for a specific APIServer to the specified FlagSet.
 func (f *FeatureOptions) AddFlags(fs *pflag.FlagSet) {
-
 	fs.BoolVar(&f.Gzip.Enabled, "feature.gzip.enabled", f.Gzip.Enabled, "Whether to enable Gzip compression.")
 
 	fs.IntVar(&f.Gzip.Level, "feature.gzip.level", f.Gzip.Level, "The compression level can be any integer value between DefaultCompression = -1, NoCompression = 0, HuffmanOnly = -2 or BestSpeed = 1 and BestCompression = 9.")
