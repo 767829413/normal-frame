@@ -3,6 +3,7 @@ package v1
 import (
 	"time"
 
+	v1 "github.com/767829413/normal-frame/internal/apiserver/controller/v1"
 	"github.com/767829413/normal-frame/internal/apiserver/model"
 	srvv1 "github.com/767829413/normal-frame/internal/apiserver/service/v1"
 	"github.com/767829413/normal-frame/internal/apiserver/validation"
@@ -15,13 +16,17 @@ type UserController struct {
 	srv srvv1.Service
 }
 
-func NewUserController(st store.Factory) {}
+func NewUserController(st store.Factory) *UserController {
+	return &UserController{
+		srv: srvv1.NewService(st),
+	}
+}
 
 // Create add new user to the storage.
 func (u *UserController) Create(c *gin.Context) {
 
 	var r model.User
-	resp := &Res{State: 1, Msg: "success"}
+	resp := &v1.Res{State: 1, Msg: "success"}
 	// Binding parameters
 	if err := c.ShouldBindJSON(&r); err != nil {
 		resp.Msg = err.Error()
