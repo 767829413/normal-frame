@@ -46,6 +46,7 @@ func CreateAPIServer(opts *options.Options) (*ApiServer, error) {
 		genericServer: genericServer,
 		MySQLOptions:  opts.MySQLOptions,
 		RedisOptions:  opts.RedisOptions,
+		ApmOptions:    opts.ApmOptions,
 	}
 	if extraConfig.EnableGRPC {
 		extraServer, err := NewGrpcServer(extraConfig)

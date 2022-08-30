@@ -2,7 +2,7 @@ package flag
 
 import (
 	goflag "flag"
-	"fmt"
+	"log"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -25,6 +25,6 @@ func InitFlags(flags *pflag.FlagSet) {
 // PrintFlags logs the flags in the flagset.
 func PrintFlags(flags *pflag.FlagSet) {
 	flags.VisitAll(func(flag *pflag.Flag) {
-		fmt.Printf("FLAG: --%s=%q", flag.Name, flag.Value)
+		log.Printf("FLAG: --%s=%q \n", flag.Name, flag.Value)
 	})
 }

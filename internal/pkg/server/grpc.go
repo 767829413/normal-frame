@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net"
 
 	"github.com/767829413/normal-frame/internal/pkg/config"
@@ -38,10 +39,10 @@ func (s *grpcServer) Run() {
 			logger.LogErrorf(nil, logger.LogNameGRpc, "failed to start grpc server: %s", err.Error())
 		}
 	}()
-	logger.LogInfof(nil, logger.LogNameGRpc, "start grpc server at %s", s.address)
+	log.Printf("start grpc server at %s", s.address)
 }
 
 func (s *grpcServer) Close() {
 	s.GracefulStop()
-	logger.LogInfof(nil, logger.LogNameGRpc, "GRPC server on %s stopped", s.address)
+	log.Printf("GRPC server on %s stopped", s.address)
 }

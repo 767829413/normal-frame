@@ -1,24 +1,22 @@
 package options
 
 import (
-	"time"
-
 	"github.com/spf13/pflag"
 	glogger "gorm.io/gorm/logger"
 )
 
 type MySQLOptions struct {
-	Enabled               bool          `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
-	IsDebug               bool          `json:"is-debug" mapstructure:"is-debug" yaml:"is-debug"`
-	Host                  string        `json:"host,omitempty" mapstructure:"host" yaml:"host"`
-	Port                  int           `json:"port,omitempty" mapstructure:"port" yaml:"port"`
-	Username              string        `json:"username,omitempty" mapstructure:"username" yaml:"username"`
-	Password              string        `json:"-" mapstructure:"password" yaml:"password"`
-	Database              string        `json:"database"  mapstructure:"database" yaml:"database"`
-	MaxIdleConnections    int           `json:"max-idle-connections,omitempty" mapstructure:"max-idle-connections" yaml:"max-idle-connections"`
-	MaxOpenConnections    int           `json:"max-open-connections,omitempty" mapstructure:"max-open-connections" yaml:"max-open-connections"`
-	MaxConnectionLifeTime time.Duration `json:"max-connection-life-time,omitempty" mapstructure:"max-connection-life-time" yaml:"max-connection-life-time"`
-	LogLevel              int           `json:"log-level" mapstructure:"log-level" yaml:"log-level"`
+	Enabled               bool   `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
+	IsDebug               bool   `json:"is-debug" mapstructure:"is-debug" yaml:"is-debug"`
+	Host                  string `json:"host,omitempty" mapstructure:"host" yaml:"host"`
+	Port                  int    `json:"port,omitempty" mapstructure:"port" yaml:"port"`
+	Username              string `json:"username,omitempty" mapstructure:"username" yaml:"username"`
+	Password              string `json:"-" mapstructure:"password" yaml:"password"`
+	Database              string `json:"database"  mapstructure:"database" yaml:"database"`
+	MaxIdleConnections    int    `json:"max-idle-connections,omitempty" mapstructure:"max-idle-connections" yaml:"max-idle-connections"`
+	MaxOpenConnections    int    `json:"max-open-connections,omitempty" mapstructure:"max-open-connections" yaml:"max-open-connections"`
+	MaxConnectionLifeTime int    `json:"max-connection-life-time,omitempty" mapstructure:"max-connection-life-time" yaml:"max-connection-life-time"`
+	LogLevel              int    `json:"log-level" mapstructure:"log-level" yaml:"log-level"`
 }
 
 func NewMySQLOptions() *MySQLOptions {
@@ -32,7 +30,7 @@ func NewMySQLOptions() *MySQLOptions {
 		Database:              "",
 		MaxIdleConnections:    100,
 		MaxOpenConnections:    100,
-		MaxConnectionLifeTime: time.Duration(10) * time.Second,
+		MaxConnectionLifeTime: 10,
 		LogLevel:              int(glogger.Info),
 	}
 }
@@ -63,7 +61,7 @@ func (o *MySQLOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&o.MaxOpenConnections, "mysql.max-open-connections", o.MaxOpenConnections, ""+
 		"Maximum open connections allowed to connect to mysql.")
 
-	fs.DurationVar(&o.MaxConnectionLifeTime, "mysql.max-connection-life-time", o.MaxConnectionLifeTime, ""+
+	fs.IntVar(&o.MaxConnectionLifeTime, "mysql.max-connection-life-time", o.MaxConnectionLifeTime, ""+
 		"Maximum connection life time allowed to connect to mysql.")
 
 	fs.IntVar(&o.LogLevel, "mysql.log-level", o.LogLevel, ""+

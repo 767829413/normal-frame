@@ -1,0 +1,51 @@
+server:
+  mode: ""
+  healthz: true
+  bind-address: ""
+  bind-port: 80
+mysql:
+  enabled: false
+  is-debug: false
+  host: "127.0.0.1"
+  port: 3306
+  username: ""
+  password: ""
+  database: ""
+  max-idle-connections: 100
+  max-open-connections: 100
+  max-connection-life-time: 10
+  log-level: 4
+redis:
+  enabled: false
+  address: "127.0.0.1:6379"
+  prefix: "apiserver"
+logs:
+  out-put: "stdout"
+grpc:
+  enabled: false
+  bind-address: "0.0.0.0"
+  bind-port: 8081
+  max-msg-size: 4194304
+feature:
+  enable-pprof: false
+  enable-metrics: false
+  gzip:
+    enabled: true
+    level: -1
+secure:
+  tls:
+    cert-key:
+      cert-file:
+      private-key-file:
+    cert-dir: ""
+    pair-name: ""
+https:
+  enabled: false
+  bind-address: "0.0.0.0"
+  bind-port: 8443
+apm:
+  enabled: false
+  address: "/sidecar/sky-agent.sock"
+  http: true
+  mysql: true
+  redis: false

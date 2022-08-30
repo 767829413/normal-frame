@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"runtime"
 	"strings"
@@ -99,7 +99,7 @@ func (c *Command) cobraCommand() *cobra.Command {
 func (c *Command) runCommand(cmd *cobra.Command, args []string) {
 	if c.runFunc != nil {
 		if err := c.runFunc(args); err != nil {
-			fmt.Printf("%v %v\n", color.RedString("Error:"), err)
+			log.Printf("%v %v\n", color.RedString("Error:"), err)
 			os.Exit(1)
 		}
 	}

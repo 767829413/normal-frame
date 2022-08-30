@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -31,7 +32,7 @@ func addConfigFlag(confName string, fs *pflag.FlagSet) {
 			viper.AddConfigPath(".")
 			viper.SetConfigName(confName)
 		}
-
+		log.Println(confName)
 		if err := viper.ReadInConfig(); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "Error: failed to read configuration file(%s): %v\n", cfgFile, err)
 			os.Exit(1)

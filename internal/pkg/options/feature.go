@@ -8,9 +8,9 @@ import (
 
 // FeatureOptions contains configuration items related to API server features.
 type FeatureOptions struct {
-	EnablePprof   bool `json:"enable-pprof" mapstructure:"enable-pprof" yaml:"enable-pprof"`
-	EnableMetrics bool `json:"enable-metrics" mapstructure:"enable-metrics" yaml:"enable-metrics"`
-	*Gzip
+	EnablePprof   bool  `json:"enable-pprof" mapstructure:"enable-pprof" yaml:"enable-pprof"`
+	EnableMetrics bool  `json:"enable-metrics" mapstructure:"enable-metrics" yaml:"enable-metrics"`
+	Gzip          *Gzip `json:"gzip" mapstructure:"gzip" yaml:"gzip"`
 }
 
 type Gzip struct {

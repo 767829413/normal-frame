@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	cliflag "github.com/767829413/normal-frame/fork/component-base/cli/flag"
@@ -71,7 +72,7 @@ type App struct {
 
 // NewApp creates a new application instance based on the given application name,
 // binary name, and other options.
-func NewApp(name string, confName, basename string, opts ...Option) *App {
+func NewApp(name string, basename, confName string, opts ...Option) *App {
 	a := &App{
 		name:     name,
 		basename: basename,
@@ -215,13 +216,13 @@ func (a *App) runCommand(cmd *cobra.Command, args []string) error {
 
 func printWorkingDir() {
 	wd, _ := os.Getwd()
-	fmt.Printf("%v WorkingDir: %s", progressMessage, wd)
+	log.Printf("%v WorkingDir: %s", progressMessage, wd)
 }
 
 // Run is used to launch the application.
 func (a *App) Run() {
 	if err := a.cmd.Execute(); err != nil {
-		fmt.Printf("%v %v\n", color.RedString("Error:"), err)
+		log.Printf("%v %v\n", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }

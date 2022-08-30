@@ -15,6 +15,7 @@ type Options struct {
 	FeatureOptions          *options.FeatureOptions   `json:"feature" mapstructure:"feature" yaml:"feature"`
 	SecureOptions           *options.SecureOptions    `json:"secure" mapstructure:"secure" yaml:"secure"`
 	HttpsOptions            *options.HttpsOptions     `json:"https" mapstructure:"https" yaml:"https"`
+	ApmOptions              *options.ApmOptions       `json:"apm" mapstructure:"apm" yaml:"apm"`
 }
 
 // NewOptions creates a new Options object with default parameters.
@@ -28,12 +29,13 @@ func NewOptions() *Options {
 		FeatureOptions:          options.NewFeatureOptions(),
 		SecureOptions:           options.NewSecureOptions(),
 		HttpsOptions:            options.NewHttpsOptions(),
+		ApmOptions:              options.NewApmOptions(),
 	}
 }
 
 // Flags returns flags for a specific APIServer by section name.
 func (o *Options) Flags() (fss cliflag.NamedFlagSets) {
-	o.GenericServerRunOptions.AddFlags(fss.FlagSet("generic"))
+	o.GenericServerRunOptions.AddFlags(fss.FlagSet("server"))
 	o.MySQLOptions.AddFlags(fss.FlagSet("mysql"))
 	o.LogsOptions.AddFlags(fss.FlagSet("logs"))
 	o.GrpcOptions.AddFlags(fss.FlagSet("grpc"))
@@ -41,5 +43,6 @@ func (o *Options) Flags() (fss cliflag.NamedFlagSets) {
 	o.SecureOptions.AddFlags(fss.FlagSet("secure"))
 	o.HttpsOptions.AddFlags(fss.FlagSet("https"))
 	o.RedisOptions.AddFlags(fss.FlagSet("redis"))
+	o.ApmOptions.AddFlags(fss.FlagSet("apm"))
 	return fss
 }

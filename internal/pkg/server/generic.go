@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 	"github.com/767829413/normal-frame/internal/apiserver/options"
 	customerRouter "github.com/767829413/normal-frame/internal/apiserver/router"
 	"github.com/767829413/normal-frame/internal/pkg/config"
-	"github.com/767829413/normal-frame/internal/pkg/logger"
 	"github.com/767829413/normal-frame/pkg/middleware"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -58,6 +58,7 @@ func NewGenericServer(genericConfig *config.GenericConfig, extraConfig *config.E
 		httpsPort:     extraConfig.HttpsPort,
 		certFile:      extraConfig.CertFile,
 		keyFile:       extraConfig.KeyFile,
+		Engine:        gin.New(),
 	}
 	s.initGenericAPIServer()
 	return s, nil
@@ -72,7 +73,7 @@ func (s *genericServer) initGenericAPIServer() {
 // Setup do some setup work for gin engine.
 func (s *genericServer) Setup() {
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-		logger.LogInfof(nil, logger.LogNameNet, "%-6s %-s --> %s (%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
+		log.Printf("%-6s %-s --> %s (%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
 	}
 }
 
@@ -86,7 +87,7 @@ func (s *genericServer) InstallMiddlewares() {
 	s.Use(middleware.Recovery())
 	// install custom middlewares
 	for k, m := range middleware.Middlewares {
-		logger.LogErrorf(nil, logger.LogNameNet, "install middleware: %s", k)
+		log.Printf("install middleware: %s", k)
 		s.Use(m)
 	}
 }
@@ -129,14 +130,14 @@ func (s *genericServer) Run() error {
 
 	}
 	eg.Go(func() error {
-		logger.LogInfof(nil, logger.LogNameNet, "Start to listening the incoming requests on http address: %s", httpAddr)
+		log.Printf("Start to listening the incoming requests on http address: %s", httpAddr)
 
 		if err := s.http.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.LogError(nil, logger.LogNameNet, err.Error())
+			log.Printf("Start to listening the incoming requests on http failed : %s", err.Error())
 			return err
 		}
 
-		logger.LogInfof(nil, logger.LogNameNet, "Server on %s stopped", httpAddr)
+		log.Printf("Server on %s stopped", httpAddr)
 
 		return nil
 	})
@@ -152,13 +153,13 @@ func (s *genericServer) Run() error {
 		}
 
 		eg.Go(func() error {
-			logger.LogInfof(nil, logger.LogNameNet, "Start to listening the incoming requests on https address: %s", httpsAddr)
+			log.Printf("Start to listening the incoming requests on https address: %s", httpsAddr)
 			if err := s.https.ListenAndServeTLS(s.certFile, s.keyFile); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logger.LogError(nil, logger.LogNameNet, err.Error())
+				log.Printf("Start to listening the incoming requests on https failed : %s", err.Error())
 				return err
 			}
 
-			logger.LogInfof(nil, logger.LogNameNet, "Server on %s stopped", httpsAddr)
+			log.Printf("Server on %s stopped", httpsAddr)
 
 			return nil
 		})
@@ -166,7 +167,8 @@ func (s *genericServer) Run() error {
 	}
 
 	if err := eg.Wait(); err != nil {
-		logger.LogError(nil, logger.LogNameNet, err.Error())
+		log.Printf("eg.Wait() failed : %s", err.Error())
+		return err
 	}
 	return nil
 }
@@ -178,11 +180,11 @@ func (s *genericServer) Close() {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	if err := s.http.Shutdown(ctx); err != nil {
-		logger.LogWarnf(nil, logger.LogNameNet, "Shutdown http server failed: %s", err.Error())
+		log.Printf("Shutdown http server failed: %s", err.Error())
 	}
 	if s.enableHttps && s.https != nil {
 		if err := s.https.Shutdown(ctx); err != nil {
-			logger.LogWarnf(nil, logger.LogNameNet, "Shutdown https server failed: %s", err.Error())
+			log.Printf("Shutdown https server failed: %s", err.Error())
 		}
 	}
 
