@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/767829413/normal-frame/internal/apiserver/model"
-	"github.com/767829413/normal-frame/internal/pkg/logger"
 	mylog "github.com/767829413/normal-frame/internal/pkg/logger"
 	"github.com/767829413/normal-frame/internal/pkg/options"
 	"github.com/767829413/normal-frame/pkg/db"
@@ -83,7 +82,7 @@ func (d *datastore) SqlMigrate() (err error) {
 		return
 	}
 	if err = d.db.AutoMigrate(model.GetModels()); err != nil {
-		logger.LogErrorw(nil, logger.LogNameMysql, "sqlMigrate Orm.DB.DB() err ", err)
+		mylog.LogErrorw(nil, mylog.LogNameMysql, "sqlMigrate Orm.DB.DB() err ", err)
 		return
 	}
 	return nil

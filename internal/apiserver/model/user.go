@@ -9,10 +9,6 @@ import (
 // User represents a user restful resource. It is also used as gorm model.
 type User struct {
 	gorm.Model
-	// May add TypeMeta in the future.
-	// metav1.TypeMeta `json:",inline"`
-
-	// Standard object's metadata.
 
 	Status int `json:"status" gorm:"column:status" validate:"omitempty"`
 
@@ -32,4 +28,8 @@ type User struct {
 	TotalPolicy int64 `json:"totalPolicy" gorm:"-" validate:"omitempty"`
 
 	LoginedAt time.Time `json:"loginedAt,omitempty" gorm:"column:loginedAt"`
+}
+
+type UserList struct {
+	Items []*User `json:"items"`
 }
