@@ -197,43 +197,78 @@ func getLogName(logName string) string {
 }
 
 func LogDebugw(c *gin.Context, logName string, msg string) {
-	logrus.WithFields(fields).WithFields(getFields(c)).Debug(fmt.Sprintf("%s : %s", getLogName(logName), msg))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		Debug(fmt.Sprintf("%s : %s", getLogName(logName), msg))
 }
 
 func LogDebugf(c *gin.Context, logName string, template string, args ...interface{}) {
-	logrus.WithFields(fields).WithFields(getFields(c)).Debugf(getLogName(logName)+":"+template, args...)
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		Debugf(getLogName(logName)+":"+template, args...)
 }
 
 func LogInfow(c *gin.Context, logName string, msg string) {
-	logrus.WithFields(fields).WithFields(getFields(c)).WithFields(getFields(c)).Info(fmt.Sprintf("%s : %s", getLogName(logName), msg))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		WithFields(getFields(c)).
+		Info(fmt.Sprintf("%s : %s", getLogName(logName), msg))
 }
 
 func LogInfof(c *gin.Context, logName string, template string, args ...interface{}) {
-	logrus.WithFields(fields).WithFields(getFields(c)).Infof(getLogName(logName)+":"+template, args...)
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		Infof(getLogName(logName)+":"+template, args...)
 }
 
 func LogWarnw(c *gin.Context, logName string, msg string) {
-	logrus.WithFields(fields).WithFields(getFields(c)).Warn(fmt.Sprintf("%s : %s", getLogName(logName), msg))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		Warn(fmt.Sprintf("%s : %s", getLogName(logName), msg))
 }
 
 func LogWarnf(c *gin.Context, logName string, template string, args ...interface{}) {
-	logrus.WithFields(fields).WithFields(getFields(c)).Warnf(getLogName(logName)+":"+template, args...)
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		Warnf(getLogName(logName)+":"+template, args...)
 }
 
 func LogError(c *gin.Context, logName string, msg string) {
-	logrus.WithFields(fields).WithFields(getFields(c)).WithField(fieldLogger, traceFunc()).Error(fmt.Sprintf("%s : %s", getLogName(logName), msg))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		WithField(fieldLogger, traceFunc()).
+		Error(fmt.Sprintf("%s : %s", getLogName(logName), msg))
 }
 
 func LogErrorw(c *gin.Context, logName string, msg string, err error) {
-	logrus.WithFields(fields).WithFields(getFields(c)).WithField(fieldLogger, traceFunc()).Error(fmt.Sprintf("%s : %s, %s", getLogName(logName), msg, err.Error()))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		WithField(fieldLogger, traceFunc()).
+		Error(fmt.Sprintf("%s : %s, %s", getLogName(logName), msg, err.Error()))
 }
 
 func LogErrorf(c *gin.Context, logName string, template string, args ...interface{}) {
-	logrus.WithFields(fields).WithFields(getFields(c)).WithField(fieldLogger, traceFunc()).Errorf(getLogName(logName)+":"+template, args...)
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		WithField(fieldLogger, traceFunc()).
+		Errorf(getLogName(logName)+":"+template, args...)
 }
 
 func LogInfoCustom(c *gin.Context, logName string, fields logrus.Fields, msg string) {
-	logrus.WithFields(fields).WithFields(getFields(c)).WithFields(getFields(c)).WithFields(fields).Info(fmt.Sprintf("%s : %s", getLogName(logName), msg))
+	logrus.
+		// WithFields(fields).
+		WithFields(getFields(c)).
+		WithFields(getFields(c)).
+		WithFields(fields).Info(fmt.Sprintf("%s : %s", getLogName(logName), msg))
 }
 
 // getInternetIP 用于自动查找本机IP地址
