@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	logredis "gitlab.oneitfarm.com/bifrost/logrus-redis-hook"
+	logredis "github.com/767829413/normal-frame/fork/logrus-redis-hook"
 
 	"github.com/767829413/normal-frame/internal/pkg/options"
 	"github.com/gin-gonic/gin"
